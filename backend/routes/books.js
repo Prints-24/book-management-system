@@ -38,11 +38,11 @@ router.get('/:id', (req, res) => {
 
 // Update a book
 router.put('/update/:id', (req, res) => {
-  Book.update(req.params.id, req.body, (err) => {
+  Book.update(req.params.id, req.body, (err, updatedBook) => {
     if (err) {
       res.status(500).json({ error: 'Failed to update book' });
     } else {
-      res.json({ message: 'Book updated successfully' });
+      res.json({ message: 'Book updated successfully', book: updatedBook });
     }
   });
 });

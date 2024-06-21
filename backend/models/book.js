@@ -1,4 +1,5 @@
 import db from '../utils/db.js';
+
 class Book {
   static add(book, callback) {
     const { title, isbn, publisherId, publicationYear, genreId, language, pages, description } = book;
@@ -24,7 +25,14 @@ class Book {
     db.run(
       `UPDATE books SET title = ?, isbn = ?, publisher_id = ?, publication_year = ?, genre_id = ?, language = ?, pages = ?, description = ? WHERE id = ?`,
       [title, isbn, publisherId, publicationYear, genreId, language, pages, description, id],
-      callback
+      function(err) {
+        if (err) {
+          callback(err);
+        } else {
+          // Retrieve the updated book after update
+          Book.getById(id, callback);
+        }
+      }
     );
   }
   

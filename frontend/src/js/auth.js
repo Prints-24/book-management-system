@@ -77,18 +77,34 @@ export function renderBookForm(book = {}) {
   const formTitle = book.id ? "Edit Book" : "Add Book";
   const submitButtonText = book.id ? "Update Book" : "Add Book";
 
-  // Constructing the form HTML
+  // Constructing the form HTML with values from the 'book' object
   const formHtml = `
     <form id="book-form" data-book-id="${book.id || ""}">
       <h2>${formTitle}</h2>
-      <input type="text" name="title" placeholder="Title" value="${book.title || ""}" required>
-      <input type="text" name="isbn" placeholder="ISBN" value="${book.isbn || ""}" required>
-      <input type="number" name="publisher_id" placeholder="Publisher ID" value="${book.publisher_id || ""}" required>
-      <input type="number" name="publication_year" placeholder="Publication Year" value="${book.publication_year || ""}" required>
-      <input type="number" name="genre_id" placeholder="Genre ID" value="${book.genre_id || ""}" required>
-      <input type="text" name="language" placeholder="Language" value="${book.language || ""}" required>
-      <input type="number" name="pages" placeholder="Pages" value="${book.pages || ""}" required>
-      <textarea name="description" placeholder="Description" required>${book.description || ""}</textarea>
+      <input type="text" name="title" placeholder="Title" value="${
+        book.title || ""
+      }" required>
+      <input type="text" name="isbn" placeholder="ISBN" value="${
+        book.isbn || ""
+      }" required>
+      <input type="number" name="publisher_id" placeholder="Publisher ID" value="${
+        book.publisher_id || ""
+      }" required>
+      <input type="number" name="publication_year" placeholder="Publication Year" value="${
+        book.publication_year || ""
+      }" required>
+      <input type="number" name="genre_id" placeholder="Genre ID" value="${
+        book.genre_id || ""
+      }" required>
+      <input type="text" name="language" placeholder="Language" value="${
+        book.language || ""
+      }" required>
+      <input type="number" name="pages" placeholder="Pages" value="${
+        book.pages || ""
+      }" required>
+      <textarea name="description" placeholder="Description" required>${
+        book.description || ""
+      }</textarea>
       <button type="submit">${submitButtonText}</button>
       <button type="button" id="back-to-dashboard">Back to Dashboard</button>
     </form>

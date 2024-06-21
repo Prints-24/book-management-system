@@ -32,12 +32,17 @@ export async function addBook(bookData) {
 
 export async function updateBook(bookId, bookData) {
   try {
-    await apiCall(`/books/update/${bookId}`, 'PUT', bookData);
+    console.log("Updating book with data:", bookData); // Verify the data before sending
+
+    const updatedBook = await apiCall(`/books/update/${bookId}`, 'PUT', bookData);
+    console.log("Book updated successfully:", updatedBook); // Log the updated book details
+
     renderDashboard();
   } catch (error) {
     console.error('Failed to update book', error);
   }
 }
+
 
 
 export async function deleteBook(bookId) {
