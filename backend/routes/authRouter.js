@@ -1,6 +1,6 @@
 import express from "express";
-import User from "../models/user.js";
-import { hashPassword, generateToken, comparePassword } from "../utils/auth.js";
+import User from "../models/userModel.js";
+import { comparePassword, generateToken, hashPassword } from "../utils/authUtils.js";
 
 const router = express.Router();
 
@@ -31,7 +31,11 @@ router.post("/login", (req, res) => {
         username: user.username,
         role: user.role,
       });
-      res.json({ message: "Login successful", token });
+      res.json({ message: "Login successful", token, role: user.role });
+      console.log({
+        message: "Login successful",
+        role: user.role,
+      });
     }
   });
 });

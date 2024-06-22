@@ -53,3 +53,23 @@ export async function deleteBook(bookId) {
     console.error('Failed to delete book', error);
   }
 }
+
+// Borrow a book (only accessible by logged-in user)
+export async function borrowBook(bookId) {
+  try {
+    const response = await apiCall('/borrows/add', 'POST', { book_id: bookId });
+    alert('Book borrowed successfully:', response);
+  } catch (error) {
+    console.error('Failed to borrow book:', error);
+  }
+}
+
+// Return a book (only accessible by logged-in user)
+export async function returnBook(borrowId) {
+  try {
+    const response = await apiCall(`/borrows/return/${borrowId}`, 'POST');
+    alert('Book returned successfully:', response);
+  } catch (error) {
+    console.error('Failed to return book:', error);
+  }
+}

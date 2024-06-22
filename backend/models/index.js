@@ -1,9 +1,9 @@
-import db from '../utils/db.js';
+import db from '../utils/dbUtils.js';
 
 db.serialize(() => {
   // Create the users table
   db.run(`
-    CREATE TABLE IF NOT EXISTS users (
+     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE,
       password TEXT,

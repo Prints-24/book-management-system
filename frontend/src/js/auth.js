@@ -1,120 +1,233 @@
 import { getBooks } from "./books.js";
-
-let isLoginFormActive = true;
+import { getUsers } from "./users.js";
 
 export function renderLoginPage() {
-  document.getElementById("app").innerHTML = `
-  <div id="login-signup-container">
-    <form id="login-form" ${isLoginFormActive ? "" : 'style="display: none;"'}>
-        <h2>Login</h2>
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        <p>Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
-      </form>
-      <form id="register-form" ${
-        isLoginFormActive ? 'style="display: none;"' : ""
-      }>
-        <h2>Register</h2>
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Register</button>
-        <p>Already have an account? <a href="#" id="switch-to-login">Login</a></p>
-      </form>
-    </div>
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <h2>Login</h2>
+    <form id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit">Login</button>
+    </form>
+    <button id="show-register-form">Register</button>
   `;
-  document.getElementById("switch-to-signup").addEventListener("click", (e) => {
-    e.preventDefault();
-    isLoginFormActive = false;
-    renderLoginPage();
-  });
+  document
+    .getElementById("show-register-form")
+    .addEventListener("click", renderRegisterPage);
+}
 
-  document.getElementById("switch-to-login").addEventListener("click", (e) => {
-    e.preventDefault();
-    isLoginFormActive = true;
-    renderLoginPage();
-  });
+export function renderRegisterPage() {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <h2>Register</h2>
+    <form id="register-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <label for="role">Role:</label>
+      <select id="role" name="role" required>
+        <option value="patron">Patron</option>
+        <option value="librarian">Librarian</option>
+      </select>
+      <button type="submit">Register</button>
+    </form>
+    <button id="show-login-form">Back to Login</button>
+  `;
+  document
+    .getElementById("show-login-form")
+    .addEventListener("click", renderLoginPage);
 }
 
 export async function renderDashboard() {
-  document.getElementById("app").innerHTML = `
+  const app = document.getElementById("app");
+  const role = localStorage.getItem("role");
+  app.innerHTML = `
     <header>
-      <h1>Dashboard</h1>
-      <nav>
-        <a href="#" id="add-book">Add Book</a>
-        <a href="#" id="logout">Logout</a>
-      </nav>
+      <h1>Book Cataloging and Management System</h1>
+      ${role === "librarian" ? '<button id="add-book">Add Book</button>' : ""}
+      ${role === "librarian" ? '<button id="add-user">Add User</button>' : ""}
+      <button id="logout">Logout</button>
     </header>
-    <section id="books-list"></section>
+    <div id="book-list"></div>
+    <div id="user-list"></div>
   `;
 
   try {
-    const books = await getBooks(); // Wait for getBooks to fetch books
-    const booksList = document.getElementById("books-list");
+    const books = await getBooks();
+    renderBookList(books);
 
-    if (!booksList) {
-      throw new Error("Element with id 'books-list' not found in the DOM.");
+    if (role === "librarian") {
+      const users = await getUsers();
+      renderUserList(users);
     }
-
-    booksList.innerHTML = "";
-
-    books.forEach((book) => {
-      booksList.innerHTML += `
-        <div>
-          <h3>${book.title}</h3>
-          <p>${book.description}</p>
-          <button data-id="${book.id}" class="edit-book">Edit</button>
-          <button data-id="${book.id}" class="delete-book">Delete</button>
-        </div>
-      `;
-    });
   } catch (error) {
-    console.error("Failed to fetch books", error);
+    console.error("Failed to fetch data for dashboard", error);
   }
 }
 
 export function renderBookForm(book = {}) {
-  const formTitle = book.id ? "Edit Book" : "Add Book";
-  const submitButtonText = book.id ? "Update Book" : "Add Book";
-
-  // Constructing the form HTML with values from the 'book' object
-  const formHtml = `
-    <form id="book-form" data-book-id="${book.id || ""}">
-      <h2>${formTitle}</h2>
-      <input type="text" name="title" placeholder="Title" value="${
-        book.title || ""
+  const role = localStorage.getItem("role");
+  if (role !== "librarian") {
+    alert("Unauthorized access");
+    return;
+  }
+  const app = document.getElementById("app");
+  const {
+    id,
+    title,
+    isbn,
+    publisher_id,
+    publication_year,
+    genre_id,
+    language,
+    pages,
+    description,
+  } = book;
+  app.innerHTML = `
+    <h2>${id ? "Edit" : "Add"} Book</h2>
+    <form id="book-form" data-id="${id || ""}">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" value="${
+        title || ""
       }" required>
-      <input type="text" name="isbn" placeholder="ISBN" value="${
-        book.isbn || ""
+      <label for="isbn">ISBN:</label>
+      <input type="text" id="isbn" name="isbn" value="${isbn || ""}" required>
+      <label for="publisher_id">Publisher ID:</label>
+      <input type="number" id="publisher_id" name="publisher_id" value="${
+        publisher_id || ""
       }" required>
-      <input type="number" name="publisher_id" placeholder="Publisher ID" value="${
-        book.publisher_id || ""
+      <label for="publication_year">Publication Year:</label>
+      <input type="number" id="publication_year" name="publication_year" value="${
+        publication_year || ""
       }" required>
-      <input type="number" name="publication_year" placeholder="Publication Year" value="${
-        book.publication_year || ""
+      <label for="genre_id">Genre ID:</label>
+      <input type="number" id="genre_id" name="genre_id" value="${
+        genre_id || ""
       }" required>
-      <input type="number" name="genre_id" placeholder="Genre ID" value="${
-        book.genre_id || ""
+      <label for="language">Language:</label>
+      <input type="text" id="language" name="language" value="${
+        language || ""
       }" required>
-      <input type="text" name="language" placeholder="Language" value="${
-        book.language || ""
+      <label for="pages">Pages:</label>
+      <input type="number" id="pages" name="pages" value="${
+        pages || ""
       }" required>
-      <input type="number" name="pages" placeholder="Pages" value="${
-        book.pages || ""
-      }" required>
-      <textarea name="description" placeholder="Description" required>${
-        book.description || ""
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" required>${
+        description || ""
       }</textarea>
-      <button type="submit">${submitButtonText}</button>
-      <button type="button" id="back-to-dashboard">Back to Dashboard</button>
+      <button type="submit">${id ? "Update" : "Add"} Book</button>
     </form>
+    <button id="show-dashboard">Back to Dashboard</button>
   `;
+  document
+    .getElementById("show-dashboard")
+    .addEventListener("click", renderDashboard);
+}
 
-  // Render the form in the app container
-  document.getElementById("app").innerHTML = formHtml;
+export function renderUserForm(user = {}) {
+  const userRole = localStorage.getItem("role");
+  if (userRole !== "librarian") {
+    alert("Unauthorized access");
+    return;
+  }
+  const app = document.getElementById("app");
+  const { id, username, password, role } = user;
+  app.innerHTML = `
+    <h2>${id ? "Edit" : "Add"} User</h2>
+    <form id="user-form" data-id="${id || ""}">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" value="${
+        username || ""
+      }" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" value="${
+        password || ""
+      }" required>
+      <label for="role">Role:</label>
+      <select id="role" name="role" required>
+        <option value="patron" ${
+          role === "patron" ? "selected" : ""
+        }>Patron</option>
+        <option value="librarian" ${
+          role === "librarian" ? "selected" : ""
+        }>Librarian</option>
+      </select>
+      <button type="submit">${id ? "Update" : "Add"} User</button>
+    </form>
+    <button id="show-dashboard">Back to Dashboard</button>
+  `;
+  document
+    .getElementById("show-dashboard")
+    .addEventListener("click", renderDashboard);
+}
 
-  // Attach event listener to the back button
-  document.getElementById("back-to-dashboard").addEventListener("click", () => {
-    renderDashboard(); // Call your renderDashboard function to navigate back
-  });
+function renderBookList(books) {
+  const userRole = localStorage.getItem("role");
+  const bookList = document.getElementById("book-list");
+  bookList.innerHTML = `
+    <h2>Book List</h2>
+    <ul>
+      ${books
+        .map(
+          (book) => `
+        <li>
+          <strong>${book.title}</strong> (ISBN: ${book.isbn})
+          ${
+            userRole === "librarian"
+              ? `
+            <button class="edit-book" data-id="${book.id}">Edit</button>
+            <button class="delete-book" data-id="${book.id}">Delete</button>
+          `
+              : ""
+          }
+        </li>
+      `
+        )
+        .join("")}
+    </ul>
+  `;
+}
+
+function renderUserList(users) {
+  const userRole = localStorage.getItem("role");
+  const userList = document.getElementById("user-list");
+
+  if (userRole !== "librarian") {
+    userList.innerHTML = "";
+    return;
+  }
+
+  userList.innerHTML = `
+    <h2>User List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${users
+          .map(
+            (user) => `
+          <tr>
+            <td>${user.username}</td>
+            <td>${user.role}</td>
+            <td>
+              <button class="edit-user" data-username="${user.username}">Edit</button>
+              <button class="delete-user" data-id="${user.id}">Delete</button>
+            </td>
+          </tr>
+        `
+          )
+          .join("")}
+      </tbody>
+    </table>
+  `;
 }
