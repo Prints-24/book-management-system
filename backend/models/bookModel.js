@@ -1,11 +1,29 @@
-import db from '../utils/dbUtils.js';
+import db from "../utils/dbUtils.js";
 
 class Book {
   static add(book, callback) {
-    const { title, isbn, publisherId, publicationYear, genreId, language, pages, description } = book;
+    const {
+      title,
+      isbn,
+      publisherId,
+      publicationYear,
+      genreId,
+      language,
+      pages,
+      description,
+    } = book;
     db.run(
       `INSERT INTO books (title, isbn, publisher_id, publication_year, genre_id, language, pages, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [title, isbn, publisherId, publicationYear, genreId, language, pages, description],
+      [
+        title,
+        isbn,
+        publisherId,
+        publicationYear,
+        genreId,
+        language,
+        pages,
+        description,
+      ],
       function (err) {
         callback(err, this.lastID);
       }
@@ -21,11 +39,30 @@ class Book {
   }
 
   static update(id, book, callback) {
-    const { title, isbn, publisherId, publicationYear, genreId, language, pages, description } = book;
+    const {
+      title,
+      isbn,
+      publisherId,
+      publicationYear,
+      genreId,
+      language,
+      pages,
+      description,
+    } = book;
     db.run(
       `UPDATE books SET title = ?, isbn = ?, publisher_id = ?, publication_year = ?, genre_id = ?, language = ?, pages = ?, description = ? WHERE id = ?`,
-      [title, isbn, publisherId, publicationYear, genreId, language, pages, description, id],
-      function(err) {
+      [
+        title,
+        isbn,
+        publisherId,
+        publicationYear,
+        genreId,
+        language,
+        pages,
+        description,
+        id,
+      ],
+      function (err) {
         if (err) {
           callback(err);
         } else {
@@ -35,7 +72,7 @@ class Book {
       }
     );
   }
-  
+
   static delete(id, callback) {
     db.run(`DELETE FROM books WHERE id = ?`, [id], callback);
   }

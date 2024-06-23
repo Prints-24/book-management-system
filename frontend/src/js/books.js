@@ -1,12 +1,12 @@
-import { renderDashboard } from './auth.js';
-import { apiCall } from './api.js';
+import { renderDashboard } from "./auth.js";
+import { apiCall } from "./api.js";
 
 export async function getBooks() {
   try {
-    const response = await apiCall('/books', 'GET');
+    const response = await apiCall("/books", "GET");
     return response;
   } catch (error) {
-    console.error('Failed to fetch books', error);
+    console.error("Failed to fetch books", error);
     throw error;
   }
 }
@@ -16,60 +16,92 @@ export async function getBookById(bookId) {
     const response = await apiCall(`/books/${bookId}`, "GET");
     return response;
   } catch (error) {
-    console.error('Failed to fetch books', error);
+    console.error("Failed to fetch book", error);
     throw error;
   }
 }
 
 export async function addBook(bookData) {
   try {
-    await apiCall('/books/add', 'POST', bookData);
+    await apiCall("/books/add", "POST", bookData);
     renderDashboard();
   } catch (error) {
-    console.error('Failed to add book', error);
+    console.error("Failed to add book", error);
   }
 }
 
 export async function updateBook(bookId, bookData) {
   try {
-    console.log("Updating book with data:", bookData); // Verify the data before sending
-
-    const updatedBook = await apiCall(`/books/update/${bookId}`, 'PUT', bookData);
-    console.log("Book updated successfully:", updatedBook); // Log the updated book details
-
+    const updatedBook = await apiCall(
+      `/books/update/${bookId}`,
+      "PUT",
+      bookData
+    );
     renderDashboard();
   } catch (error) {
-    console.error('Failed to update book', error);
+    console.error("Failed to update book", error);
   }
 }
-
-
 
 export async function deleteBook(bookId) {
   try {
-    await apiCall(`/books/delete/${bookId}`, 'DELETE');
+    await apiCall(`/books/delete/${bookId}`, "DELETE");
     renderDashboard();
   } catch (error) {
-    console.error('Failed to delete book', error);
+    console.error("Failed to delete book", error);
   }
 }
 
-// Borrow a book (only accessible by logged-in user)
 export async function borrowBook(bookId) {
   try {
-    const response = await apiCall('/borrows/add', 'POST', { book_id: bookId });
-    alert('Book borrowed successfully:', response);
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      throw new Error("User not logged in");
+    }
+    const response = await apiCall("/borrows/add", "POST", {
+      user_id: userId,
+      book_id: bookId,
+    });
+    const { borrowId } = response;
+    localStorage.setItem("borrowId", borrowId);
+    alert("Book borrowed successfully");
+    renderDashboard();
   } catch (error) {
-    console.error('Failed to borrow book:', error);
+    console.error("Failed to borrow book", error);
+    alert("Cannot borrow book!");
   }
 }
 
-// Return a book (only accessible by logged-in user)
 export async function returnBook(borrowId) {
   try {
-    const response = await apiCall(`/borrows/return/${borrowId}`, 'POST');
-    alert('Book returned successfully:', response);
+    const response = await apiCall(`/borrows/return/${borrowId}`, "POST");
+    alert("Book returned successfully");
+    renderDashboard();
   } catch (error) {
-    console.error('Failed to return book:', error);
+    console.error("Failed to return book", error);
+    alert("Failed to return book!");
+  }
+}
+
+export async function renewBook(borrowId) {
+  try {
+    const response = await apiCall(`/borrows/renew/${borrowId}`, "POST");
+    alert("Book renewed successfully");
+    renderDashboard();
+  } catch (error) {
+    console.error("Failed to renew book", error);
+  }
+}
+
+export async function searchBooksByTitle(searchTerm) {
+  try {
+    const response = await apiCall(
+      `/books/search?title=${encodeURIComponent(searchTerm)}`,
+      "GET"
+    );
+    return response;
+  } catch (error) {
+    console.error("Failed to search books", error);
+    throw error;
   }
 }

@@ -55,6 +55,8 @@ router.get('/:username', (req, res) => {
   });
 });
 
+
+
 // Update user
 router.put('/update/:id', (req, res) => {
   User.update(req.params.id, req.body, (err) => {

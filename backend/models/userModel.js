@@ -24,10 +24,6 @@ class User {
     db.get(`SELECT * FROM users WHERE username = ?`, [username], callback);
   }
 
-  static getByRole(role, callback) {
-    db.all('SELECT * FROM users WHERE role = ?', [role], callback);
-  }
-
   static update(id, user, callback) {
     const { username, password, role } = user;
     db.run(

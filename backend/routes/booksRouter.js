@@ -1,5 +1,6 @@
 import express from "express";
 import Book from "../models/bookModel.js";
+import db from "../utils/dbUtils.js";
 const router = express.Router();
 
 // Add a new book
@@ -28,7 +29,7 @@ router.get("/", (req, res) => {
 
 // Get book by id
 router.get('/:id', (req, res) => {
-  User.getByUsername(req.params.id, (err, book) => {
+  Book.getById(req.params.id, (err, book) => {
     if (err) {
       res.status(500).json({ error: 'Failed to retrieve book' });
     } else {
@@ -47,6 +48,23 @@ router.put("/update/:id", (req, res) => {
       res.json({ message: "Book updated successfully", book: updatedBook });
     }
   });
+});
+
+// Search for books by title
+router.get("/search", (req, res) => {
+  const { title } = req.query;
+  db.all(
+    `SELECT * FROM books WHERE title LIKE ?`,
+    [`%${title}%`],
+    (err, rows) => {
+      if (err) {
+        console.error("Failed to search books:", err.message);
+        res.status(500).json({ error: "Failed to search books" });
+      } else {
+        res.json(rows);
+      }
+    }
+  );
 });
 
 // Delete a book

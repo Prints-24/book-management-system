@@ -27,14 +27,15 @@ router.post("/login", (req, res) => {
       res.status(401).json({ error: "Invalid credentials" });
     } else {
       const token = generateToken({
-        id: user.id,
+        userId: user.id,
         username: user.username,
         role: user.role,
       });
-      res.json({ message: "Login successful", token, role: user.role });
+      res.json({ message: "Login successful", token, role: user.role, userId: user.id });
       console.log({
         message: "Login successful",
         role: user.role,
+        userId: user.id,
       });
     }
   });

@@ -3,8 +3,16 @@ import {
   renderDashboard,
   renderBookForm,
   renderUserForm,
+  renderRegisterPage,
+  renderSearchResults,
 } from "./auth.js";
-import { addBook, updateBook, deleteBook, getBookById } from "./books.js";
+import {
+  addBook,
+  updateBook,
+  deleteBook,
+  getBookById,
+  searchBooksByTitle,
+} from "./books.js";
 import { apiCall } from "./api.js";
 import { addUser, updateUser, deleteUser, getUserByUsername } from "./users.js";
 import "../css/styles.css";
@@ -22,23 +30,26 @@ document.addEventListener("DOMContentLoaded", () => {
       renderBookForm();
     } else if (e.target.id === "add-user") {
       renderUserForm();
+    } else if (e.target.id === "show-login-form") {
+      renderLoginPage();
+    } else if (e.target.id === "show-register-form") {
+      renderRegisterPage();
+    } else if (e.target.id === "show-dashboard") {
+      renderDashboard();
+    } else if (e.target.id === "search-button") {
+      const searchTerm = document.getElementById("search-input").value;
+      try {
+        const results = await searchBooksByTitle(searchTerm);
+        renderSearchResults(results);
+      } catch (error) {
+        console.error("Failed to search books", error);
+      }
     } else if (e.target.id === "logout") {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("borrowid");
       renderLoginPage();
-    } else if (e.target.classList.contains("edit-book")) {
-      const bookId = e.target.dataset.id;
-      console.log("Book ID for editing:", bookId);
-      try {
-        const book = await getBookById(bookId);
-        console.log("Book details fetched:", book);
-        renderBookForm(book);
-      } catch (error) {
-        console.error("Failed to fetch book for editing", error);
-      }
-    } else if (e.target.classList.contains("delete-book")) {
-      const bookId = e.target.dataset.id;
-      deleteBook(bookId);
     } else if (e.target.classList.contains("edit-user")) {
       const username = e.target.dataset.username;
       console.log("Username for editing:", username);
@@ -66,11 +77,17 @@ document.addEventListener("DOMContentLoaded", () => {
           username,
           password,
         });
-        const { token, role } = response;
+        const { token, role, userId } = response;
         alert("Login Successful");
         console.log("Login response:", response);
+        console.log("Storing userId:", userId);
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
+        localStorage.setItem("userId", userId);
+        console.log(
+          "Retrieved userId after storing:",
+          localStorage.getItem("userId")
+        );
         renderDashboard();
       } catch (error) {
         alert("Login failed", error);
@@ -95,9 +112,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const bookData = {
         title: e.target.title.value,
         isbn: e.target.isbn.value,
-        publisher_id: e.target.publisher_id.value,
-        publication_year: e.target.publication_year.value,
-        genre_id: e.target.genre_id.value,
+        publisherId: e.target.publisher_id.value,
+        publicationYear: e.target.publication_year.value,
+        genreId: e.target.genre_id.value,
         language: e.target.language.value,
         pages: e.target.pages.value,
         description: e.target.description.value,

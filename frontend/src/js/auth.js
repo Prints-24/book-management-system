@@ -1,4 +1,4 @@
-import { getBooks } from "./books.js";
+import { borrowBook, getBooks, returnBook, renewBook } from "./books.js";
 import { getUsers } from "./users.js";
 
 export function renderLoginPage() {
@@ -14,9 +14,6 @@ export function renderLoginPage() {
     </form>
     <button id="show-register-form">Register</button>
   `;
-  document
-    .getElementById("show-register-form")
-    .addEventListener("click", renderRegisterPage);
 }
 
 export function renderRegisterPage() {
@@ -37,9 +34,6 @@ export function renderRegisterPage() {
     </form>
     <button id="show-login-form">Back to Login</button>
   `;
-  document
-    .getElementById("show-login-form")
-    .addEventListener("click", renderLoginPage);
 }
 
 export async function renderDashboard() {
@@ -48,10 +42,14 @@ export async function renderDashboard() {
   app.innerHTML = `
     <header>
       <h1>Book Cataloging and Management System</h1>
+      <h2>Search Books</h2>
+      <input type="text" id="search-input" placeholder="Enter book title">
+      <button id="search-button">Search</button>
       ${role === "librarian" ? '<button id="add-book">Add Book</button>' : ""}
       ${role === "librarian" ? '<button id="add-user">Add User</button>' : ""}
       <button id="logout">Logout</button>
     </header>
+    <div id="search-results"></div>
     <div id="book-list"></div>
     <div id="user-list"></div>
   `;
@@ -124,9 +122,6 @@ export function renderBookForm(book = {}) {
     </form>
     <button id="show-dashboard">Back to Dashboard</button>
   `;
-  document
-    .getElementById("show-dashboard")
-    .addEventListener("click", renderDashboard);
 }
 
 export function renderUserForm(user = {}) {
@@ -161,9 +156,6 @@ export function renderUserForm(user = {}) {
     </form>
     <button id="show-dashboard">Back to Dashboard</button>
   `;
-  document
-    .getElementById("show-dashboard")
-    .addEventListener("click", renderDashboard);
 }
 
 function renderBookList(books) {
@@ -178,6 +170,16 @@ function renderBookList(books) {
         <li>
           <strong>${book.title}</strong> (ISBN: ${book.isbn})
           ${
+            userRole === "patron"
+              ? `
+            <button class="borrow-book" data-id="${book.id}">Borrow</button>
+            <button class="return-book" data-id="${book.borrowId || ''}">Return</button>
+            <button class="renew-book" data-id="${book.borrowId || ''}">Renew</button>
+            `
+              : ""
+          }
+
+          ${
             userRole === "librarian"
               ? `
             <button class="edit-book" data-id="${book.id}">Edit</button>
@@ -191,7 +193,43 @@ function renderBookList(books) {
         .join("")}
     </ul>
   `;
+
+  document.querySelectorAll(".borrow-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const bookId = e.target.dataset.id;
+      borrowBook(bookId);
+    });
+  });
+
+  document.querySelectorAll(".return-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const borrowId = e.target.dataset.id;
+      returnBook(borrowId);
+    });
+  });
+
+  document.querySelectorAll(".renew-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const borrowId = e.target.dataset.id;
+      renewBook(borrowId);
+    });
+  });
+
+  document.querySelectorAll(".edit-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const bookId = e.target.dataset.id;
+      renderEditBookForm(bookId);
+    });
+  });
+
+  document.querySelectorAll(".delete-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const bookId = e.target.dataset.id;
+      deleteBook(bookId);
+    });
+  });
 }
+
 
 function renderUserList(users) {
   const userRole = localStorage.getItem("role");
@@ -230,4 +268,46 @@ function renderUserList(users) {
       </tbody>
     </table>
   `;
+}
+
+export function renderSearchResults(books) {
+  const searchResults = document.getElementById("search-results");
+  searchResults.innerHTML = `
+    <h2>Search Results</h2>
+    <ul>
+      ${books
+        .map(
+          (book) => `
+        <li>
+          <strong>${book.title}</strong> (ISBN: ${book.isbn})
+          <button class="borrow-book" data-id="${book.id}">Borrow</button>
+          <button class="return-book" data-id="${book.borrowId}">Return</button>
+          <button class="renew-book" data-id="${book.borrowId}">Renew</button>
+        </li>
+      `
+        )
+        .join("")}
+    </ul>
+  `;
+
+  document.querySelectorAll(".borrow-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const bookId = e.target.dataset.id;
+      borrowBook(bookId);
+    });
+  });
+
+  document.querySelectorAll(".return-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const borrowId = e.target.dataset.id;
+      returnBook(borrowId);
+    });
+  });
+
+  document.querySelectorAll(".renew-book").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const borrowId = e.target.dataset.id;
+      renewBook(borrowId);
+    });
+  });
 }
