@@ -58,12 +58,21 @@ export async function borrowBook(bookId) {
     if (!userId) {
       throw new Error("User not logged in");
     }
+    
+    // Calculate due date (2 weeks from now)
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 14);
+
     const response = await apiCall("/borrows/add", "POST", {
       user_id: userId,
       book_id: bookId,
+      due_date: dueDate.toISOString(), // Store due date as ISO string
     });
+
     const { borrowId } = response;
     localStorage.setItem("borrowId", borrowId);
+    localStorage.setItem("dueDate", dueDate.getTime()); // Store due date timestamp
+
     alert("Book borrowed successfully");
     renderDashboard();
   } catch (error) {
@@ -72,26 +81,43 @@ export async function borrowBook(bookId) {
   }
 }
 
-export async function returnBook(borrowId) {
+
+export async function returnBook() {
   try {
+    const borrowId = localStorage.getItem("borrowId");
     const response = await apiCall(`/borrows/return/${borrowId}`, "POST");
+    console.log(response);
+    localStorage.removeItem("dueDate");
     alert("Book returned successfully");
     renderDashboard();
   } catch (error) {
     console.error("Failed to return book", error);
-    alert("Failed to return book!");
+    alert(error.message);
   }
 }
 
-export async function renewBook(borrowId) {
+
+export async function renewBook() {
   try {
-    const response = await apiCall(`/borrows/renew/${borrowId}`, "POST");
+    const borrowId = localStorage.getItem("borrowId");
+    const currentDueDate = new Date(parseInt(localStorage.getItem("dueDate")));
+    const newDueDate = new Date(currentDueDate);
+    newDueDate.setDate(newDueDate.getDate() + 7); // Renew for additional week
+
+    const response = await apiCall(`/borrows/renew/${borrowId}`, "POST", {
+      due_date: newDueDate.toISOString(), // Store new due date as ISO string
+    });
+
+    localStorage.setItem("dueDate", newDueDate.getTime()); // Update due date in localStorage
+
     alert("Book renewed successfully");
     renderDashboard();
   } catch (error) {
     console.error("Failed to renew book", error);
+    alert("Failed to renew book!");
   }
 }
+
 
 export async function searchBooksByTitle(searchTerm) {
   try {

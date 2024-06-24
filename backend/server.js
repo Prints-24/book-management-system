@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import './models/index.js';
 
 import booksRouter from './routes/booksRouter.js';
 import usersRouter from './routes/usersRouter.js';

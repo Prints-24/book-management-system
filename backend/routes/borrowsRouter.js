@@ -37,9 +37,11 @@ router.post("/add", (req, res) => {
     }
   );
 });
+
 // Return a book
 router.post("/return/:id", (req, res) => {
   const borrowId = req.params.id;
+  console.log(`Request to return book with ID: ${borrowId}`);
   Borrow.returnBook(borrowId, (err, id) => {
     if (err) {
       console.error("Failed to return book:", err.message);
@@ -47,11 +49,12 @@ router.post("/return/:id", (req, res) => {
     } else {
       res.json({
         message: "Book returned successfully",
-        borrowId: id
+        borrowId: id,
       });
     }
   });
 });
+
 // Renew a book
 router.post("/renew/:id", (req, res) => {
   const borrowId = req.params.id;

@@ -12,6 +12,8 @@ import {
   deleteBook,
   getBookById,
   searchBooksByTitle,
+  returnBook,
+  borrowBook,
 } from "./books.js";
 import { apiCall } from "./api.js";
 import { addUser, updateUser, deleteUser, getUserByUsername } from "./users.js";
@@ -50,6 +52,17 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("userId");
       localStorage.removeItem("borrowid");
       renderLoginPage();
+    } else if (e.target.classList.contains("edit-book")) {
+      const bookId = e.target.dataset.id;
+      try {
+        const book = await getBookById(bookId);
+        renderBookForm(book);
+      } catch (error) {
+        console.error("Failed to fetch book for editing", error);
+      }
+    } else if (e.target.classList.contains("delete-book")) {
+      const bookId = e.target.dataset.id;
+      deleteBook(bookId);
     } else if (e.target.classList.contains("edit-user")) {
       const username = e.target.dataset.username;
       console.log("Username for editing:", username);
@@ -63,6 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (e.target.classList.contains("delete-user")) {
       const userId = e.target.dataset.id;
       deleteUser(userId);
+    } else if (e.target.classList.contains("borrow-book")) {
+      const bookId = e.target.dataset.id;
+      borrowBook(bookId);
+    } else if (e.target.classList.contains("return-book")) {
+      const borrowId = e.target.dataset.id;
+      returnBook(borrowId);
+    } else if (e.target.classList.contains("renew-book")) {
+      const borrowId = e.target.dataset.id;
+      borrowBook(borrowId);
     }
   });
 

@@ -193,41 +193,6 @@ function renderBookList(books) {
         .join("")}
     </ul>
   `;
-
-  document.querySelectorAll(".borrow-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const bookId = e.target.dataset.id;
-      borrowBook(bookId);
-    });
-  });
-
-  document.querySelectorAll(".return-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const borrowId = e.target.dataset.id;
-      returnBook(borrowId);
-    });
-  });
-
-  document.querySelectorAll(".renew-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const borrowId = e.target.dataset.id;
-      renewBook(borrowId);
-    });
-  });
-
-  document.querySelectorAll(".edit-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const bookId = e.target.dataset.id;
-      renderEditBookForm(bookId);
-    });
-  });
-
-  document.querySelectorAll(".delete-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const bookId = e.target.dataset.id;
-      deleteBook(bookId);
-    });
-  });
 }
 
 

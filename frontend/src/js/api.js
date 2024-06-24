@@ -10,11 +10,22 @@ export async function apiCall(url, method, data) {
       body: data ? JSON.stringify(data) : undefined
     });
 
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+    // Check if the response has a JSON Content-Type header
+    const contentType = response.headers.get('Content-Type');
+    let responseData;
+    
+    if (contentType && contentType.includes('application/json')) {
+      responseData = await response.json();
+    } else {
+      responseData = await response.text();
     }
 
-    return response.json();
+    if (!response.ok) {
+      // Throw an error containing the backend's error message or the response text
+      throw new Error(responseData.error || responseData || 'Network response was not ok');
+    }
+
+    return responseData;
   } catch (error) {
     console.error('API call error:', error);
     throw error;

@@ -27,11 +27,13 @@ class Borrow {
         } else if (this.changes === 0) {
           callback(new Error("Book is already returned or does not exist"));
         } else {
-          callback(null, borrowId); // Pass borrowId back on success
+          callback(null, borrowId);
         }
       }
     );
   }
+  
+  
 }
 
 export default Borrow;
