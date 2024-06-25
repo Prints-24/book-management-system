@@ -95,6 +95,7 @@ db.serialize(() => {
       user_id INTEGER,
       book_id INTEGER,
       borrow_date TEXT,
+      due_date TEXT,
       return_date TEXT
     )
   `, (err) => {

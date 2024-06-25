@@ -1,4 +1,4 @@
-import { borrowBook, getBooks, returnBook, renewBook } from "./books.js";
+import { getBooks } from "./books.js";
 import { getUsers } from "./users.js";
 
 export function renderLoginPage() {
@@ -63,7 +63,7 @@ export async function renderDashboard() {
       renderUserList(users);
     }
   } catch (error) {
-    console.error("Failed to fetch data for dashboard", error);
+    alert(error);
   }
 }
 
@@ -173,8 +173,8 @@ function renderBookList(books) {
             userRole === "patron"
               ? `
             <button class="borrow-book" data-id="${book.id}">Borrow</button>
-            <button class="return-book" data-id="${book.borrowId || ''}">Return</button>
-            <button class="renew-book" data-id="${book.borrowId || ''}">Renew</button>
+            <button class="return-book" data-id="${book.borrowId}">Return</button>
+            <button class="renew-book" data-id="${book.borrowId}">Renew</button>
             `
               : ""
           }
@@ -254,25 +254,4 @@ export function renderSearchResults(books) {
         .join("")}
     </ul>
   `;
-
-  document.querySelectorAll(".borrow-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const bookId = e.target.dataset.id;
-      borrowBook(bookId);
-    });
-  });
-
-  document.querySelectorAll(".return-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const borrowId = e.target.dataset.id;
-      returnBook(borrowId);
-    });
-  });
-
-  document.querySelectorAll(".renew-book").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const borrowId = e.target.dataset.id;
-      renewBook(borrowId);
-    });
-  });
 }

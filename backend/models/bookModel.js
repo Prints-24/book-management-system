@@ -30,6 +30,20 @@ class Book {
     );
   }
 
+  static searchByTitle(title, callback) {
+    db.all(
+      `SELECT * FROM books WHERE title LIKE ?`,
+      [`%${title}%`],
+      (err, rows) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, rows);
+        }
+      }
+    );
+  }
+
   static getAll(callback) {
     db.all(`SELECT * FROM books`, [], callback);
   }

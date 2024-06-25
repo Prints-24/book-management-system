@@ -1,5 +1,5 @@
-import { apiCall } from './api.js';
 import { renderDashboard } from './auth.js';
+import { apiCall } from './api.js';
 
 // Librarian functions
 
@@ -10,7 +10,7 @@ export async function addUser(userData) {
     alert('User added successfully:', response);
     renderDashboard();
   } catch (error) {
-    console.error('Failed to add user:', error);
+    alert(error);
   }
 }
 
@@ -20,7 +20,6 @@ export async function getUsers() {
     const users = await apiCall('/users', 'GET');
     return users;
   } catch (error) {
-    console.error('Failed to fetch users:', error);
     throw error;
   }
 }
@@ -32,7 +31,7 @@ export async function updateUser(userId, userData) {
     alert('User updated successfully:', updatedUser);
     renderDashboard();
   } catch (error) {
-    console.error('Failed to update user:', error);
+    alert(error);
   }
 }
 
@@ -43,19 +42,16 @@ export async function deleteUser(userId) {
     alert('User deleted successfully');
     renderDashboard();
   } catch (error) {
-    console.error('Failed to delete user:', error);
+    alert(error);
   }
 }
 
-// Patron functions
-
-// Get user by username
+// Get user by username (only accessible by librarian)
 export async function getUserByUsername(username) {
   try {
     const user = await apiCall(`/users/${username}`, 'GET');
     return user;
   } catch (error) {
-    console.error('Failed to fetch user:', error);
     throw error;
   }
 }

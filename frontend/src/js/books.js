@@ -1,12 +1,20 @@
 import { renderDashboard } from "./auth.js";
 import { apiCall } from "./api.js";
 
+export async function addBook(bookData) {
+  try {
+    await apiCall("/books/add", "POST", bookData);
+    renderDashboard();
+  } catch (error) {
+    alert(error);
+  }
+}
+
 export async function getBooks() {
   try {
-    const response = await apiCall("/books", "GET");
+    const response = await apiCall('/books', 'GET');
     return response;
   } catch (error) {
-    console.error("Failed to fetch books", error);
     throw error;
   }
 }
@@ -16,108 +24,63 @@ export async function getBookById(bookId) {
     const response = await apiCall(`/books/${bookId}`, "GET");
     return response;
   } catch (error) {
-    console.error("Failed to fetch book", error);
     throw error;
-  }
-}
-
-export async function addBook(bookData) {
-  try {
-    await apiCall("/books/add", "POST", bookData);
-    renderDashboard();
-  } catch (error) {
-    console.error("Failed to add book", error);
   }
 }
 
 export async function updateBook(bookId, bookData) {
   try {
-    const updatedBook = await apiCall(
-      `/books/update/${bookId}`,
-      "PUT",
-      bookData
-    );
+    await apiCall(`/books/update/${bookId}`, "PUT", bookData);
     renderDashboard();
   } catch (error) {
-    console.error("Failed to update book", error);
+    alert(error);
   }
 }
 
 export async function deleteBook(bookId) {
   try {
     await apiCall(`/books/delete/${bookId}`, "DELETE");
+    alert('Book deleted successfully');
     renderDashboard();
   } catch (error) {
-    console.error("Failed to delete book", error);
+    alert(error);
   }
 }
 
 export async function borrowBook(bookId) {
   try {
     const userId = localStorage.getItem("userId");
-    if (!userId) {
-      throw new Error("User not logged in");
-    }
-    
-    // Calculate due date (2 weeks from now)
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + 14);
-
     const response = await apiCall("/borrows/add", "POST", {
       user_id: userId,
       book_id: bookId,
-      due_date: dueDate.toISOString(), // Store due date as ISO string
     });
-
     const { borrowId } = response;
     localStorage.setItem("borrowId", borrowId);
-    localStorage.setItem("dueDate", dueDate.getTime()); // Store due date timestamp
-
     alert("Book borrowed successfully");
-    renderDashboard();
   } catch (error) {
-    console.error("Failed to borrow book", error);
-    alert("Cannot borrow book!");
+    alert(error);
   }
 }
-
 
 export async function returnBook() {
   try {
     const borrowId = localStorage.getItem("borrowId");
-    const response = await apiCall(`/borrows/return/${borrowId}`, "POST");
-    console.log(response);
-    localStorage.removeItem("dueDate");
+    await apiCall(`/borrows/return/${borrowId}`, "POST");
     alert("Book returned successfully");
-    renderDashboard();
   } catch (error) {
-    console.error("Failed to return book", error);
-    alert(error.message);
+    alert(error);
   }
 }
-
 
 export async function renewBook() {
   try {
     const borrowId = localStorage.getItem("borrowId");
-    const currentDueDate = new Date(parseInt(localStorage.getItem("dueDate")));
-    const newDueDate = new Date(currentDueDate);
-    newDueDate.setDate(newDueDate.getDate() + 7); // Renew for additional week
-
-    const response = await apiCall(`/borrows/renew/${borrowId}`, "POST", {
-      due_date: newDueDate.toISOString(), // Store new due date as ISO string
-    });
-
-    localStorage.setItem("dueDate", newDueDate.getTime()); // Update due date in localStorage
-
+    await apiCall(`/borrows/renew/${borrowId}`, "POST", {});
     alert("Book renewed successfully");
-    renderDashboard();
   } catch (error) {
-    console.error("Failed to renew book", error);
-    alert("Failed to renew book!");
+    alert(error);
   }
 }
-
 
 export async function searchBooksByTitle(searchTerm) {
   try {
@@ -127,7 +90,6 @@ export async function searchBooksByTitle(searchTerm) {
     );
     return response;
   } catch (error) {
-    console.error("Failed to search books", error);
     throw error;
   }
 }

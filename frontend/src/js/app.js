@@ -14,6 +14,7 @@ import {
   searchBooksByTitle,
   returnBook,
   borrowBook,
+  renewBook,
 } from "./books.js";
 import { apiCall } from "./api.js";
 import { addUser, updateUser, deleteUser, getUserByUsername } from "./users.js";
@@ -44,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const results = await searchBooksByTitle(searchTerm);
         renderSearchResults(results);
       } catch (error) {
-        console.error("Failed to search books", error);
+        alert(error);
       }
     } else if (e.target.id === "logout") {
       localStorage.removeItem("token");
@@ -58,20 +59,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const book = await getBookById(bookId);
         renderBookForm(book);
       } catch (error) {
-        console.error("Failed to fetch book for editing", error);
+        alert(error);
       }
     } else if (e.target.classList.contains("delete-book")) {
       const bookId = e.target.dataset.id;
       deleteBook(bookId);
     } else if (e.target.classList.contains("edit-user")) {
       const username = e.target.dataset.username;
-      console.log("Username for editing:", username);
       try {
         const user = await getUserByUsername(username);
-        console.log("User details fetched:", user);
         renderUserForm(user);
       } catch (error) {
-        console.error("Failed to fetch user for editing", error);
+        alert(error);
       }
     } else if (e.target.classList.contains("delete-user")) {
       const userId = e.target.dataset.id;
@@ -84,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
       returnBook(borrowId);
     } else if (e.target.classList.contains("renew-book")) {
       const borrowId = e.target.dataset.id;
-      borrowBook(borrowId);
+      renewBook(borrowId);
     }
   });
 
@@ -101,34 +100,27 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const { token, role, userId } = response;
         alert("Login Successful");
-        console.log("Login response:", response);
-        console.log("Storing userId:", userId);
         localStorage.setItem("token", token);
         localStorage.setItem("role", role);
         localStorage.setItem("userId", userId);
-        console.log(
-          "Retrieved userId after storing:",
-          localStorage.getItem("userId")
-        );
         renderDashboard();
       } catch (error) {
-        alert("Login failed", error);
+        alert(error);
       }
     } else if (formId === "register-form") {
       const username = e.target.username.value;
       const password = e.target.password.value;
       const role = e.target.role.value;
       try {
-        const response = await apiCall("/auth/register", "POST", {
+        await apiCall("/auth/register", "POST", {
           username,
           password,
           role,
         });
         alert("Registration successful:");
-        console.log(response);
         renderLoginPage();
       } catch (error) {
-        alert("Registration failed", error);
+        alert(error);
       }
     } else if (formId === "book-form") {
       const bookData = {

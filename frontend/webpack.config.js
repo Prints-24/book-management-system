@@ -26,9 +26,13 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.resolve(__dirname, 'dist'), // Specify the directory where index.html is located
+      directory: path.resolve(__dirname, 'dist'), 
     },
     port: 8080,
     open: true,
+    hot: true,
   },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(), 
+  ],
 };

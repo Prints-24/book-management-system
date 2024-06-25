@@ -1,16 +1,26 @@
 import express from "express";
 import Book from "../models/bookModel.js";
-import db from "../utils/dbUtils.js";
 const router = express.Router();
 
 // Add a new book
 router.post("/add", (req, res) => {
-  Book.add(req.body, (err, id) => {
+  Book.add(req.body, (err, bookId) => {
     if (err) {
-      console.error("Failed to add book:", err.message);
-      res.status(500).json({ error: "Failed to add book" });
+      res.status(500).json({ error: "Failed to add book", message: err.message });
     } else {
-      res.json({ message: "Book added successfully", bookId: id });
+      res.json({ message: "Book added successfully", bookId });
+    }
+  });
+});
+
+// Search for books by title
+router.get('/search', (req, res) => {
+  const { title } = req.query;
+  Book.searchByTitle(title, (err, books) => {
+    if (err) {
+      res.status(500).json({ error: 'Failed to search books', message: err.message });
+    } else {
+      res.json(books);
     }
   });
 });
@@ -19,8 +29,7 @@ router.post("/add", (req, res) => {
 router.get("/", (req, res) => {
   Book.getAll((err, books) => {
     if (err) {
-      console.error("Failed to retrieve books:", err.message);
-      res.status(500).json({ error: "Failed to retrieve books" });
+      res.status(500).json({ error: "Failed to retrieve books", message:err.message });
     } else {
       res.json(books);
     }
@@ -31,7 +40,7 @@ router.get("/", (req, res) => {
 router.get('/:id', (req, res) => {
   Book.getById(req.params.id, (err, book) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to retrieve book' });
+      res.status(500).json({ error: 'Failed to retrieve the book', message: err.message });
     } else {
       res.json(book);
     }
@@ -42,37 +51,19 @@ router.get('/:id', (req, res) => {
 router.put("/update/:id", (req, res) => {
   Book.update(req.params.id, req.body, (err, updatedBook) => {
     if (err) {
-      console.error("Failed to update book:", err.message);
-      res.status(500).json({ error: "Failed to update book" });
+      res.status(500).json({ error: "Failed to update book", message: err.message });
     } else {
-      res.json({ message: "Book updated successfully", book: updatedBook });
+      res.json({ message: "Book updated successfully", updatedBook });
     }
   });
 });
 
-// Search for books by title
-router.get("/search", (req, res) => {
-  const { title } = req.query;
-  db.all(
-    `SELECT * FROM books WHERE title LIKE ?`,
-    [`%${title}%`],
-    (err, rows) => {
-      if (err) {
-        console.error("Failed to search books:", err.message);
-        res.status(500).json({ error: "Failed to search books" });
-      } else {
-        res.json(rows);
-      }
-    }
-  );
-});
 
 // Delete a book
 router.delete("/delete/:id", (req, res) => {
   Book.delete(req.params.id, (err) => {
     if (err) {
-      console.error("Failed to delete book:", err.message);
-      res.status(500).json({ error: "Failed to delete book" });
+      res.status(500).json({ error: "Failed to delete book", message: err.message });
     } else {
       res.json({ message: "Book deleted successfully" });
     }
