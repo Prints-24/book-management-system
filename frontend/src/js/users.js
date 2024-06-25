@@ -7,10 +7,10 @@ import { apiCall } from './api.js';
 export async function addUser(userData) {
   try {
     const response = await apiCall('/users/add', 'POST', userData);
-    alert('User added successfully:', response);
+    alert(response.message);
     renderDashboard();
   } catch (error) {
-    alert(error);
+    alert(error.message);
   }
 }
 
@@ -24,28 +24,6 @@ export async function getUsers() {
   }
 }
 
-// Update user information (only accessible by librarian)
-export async function updateUser(userId, userData) {
-  try {
-    const updatedUser = await apiCall(`/users/update/${userId}`, 'PUT', userData);
-    alert('User updated successfully:', updatedUser);
-    renderDashboard();
-  } catch (error) {
-    alert(error);
-  }
-}
-
-// Delete a user (only accessible by librarian)
-export async function deleteUser(userId) {
-  try {
-    await apiCall(`/users/delete/${userId}`, 'DELETE');
-    alert('User deleted successfully');
-    renderDashboard();
-  } catch (error) {
-    alert(error);
-  }
-}
-
 // Get user by username (only accessible by librarian)
 export async function getUserByUsername(username) {
   try {
@@ -53,6 +31,28 @@ export async function getUserByUsername(username) {
     return user;
   } catch (error) {
     throw error;
+  }
+}
+
+// Update user information (only accessible by librarian)
+export async function updateUser(userId, userData) {
+  try {
+    const response = await apiCall(`/users/update/${userId}`, 'PUT', userData);
+    alert(response.message);
+    renderDashboard();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Delete a user (only accessible by librarian)
+export async function deleteUser(userId) {
+  try {
+    const response = await apiCall(`/users/delete/${userId}`, 'DELETE');
+    alert(response.message);
+    renderDashboard();
+  } catch (error) {
+    alert(error.message);
   }
 }
 

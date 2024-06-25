@@ -1,4 +1,5 @@
 const path = require('path');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
   entry: './src/js/app.js',
@@ -32,7 +33,4 @@ module.exports = {
     open: true,
     hot: true,
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin(), 
-  ],
 };

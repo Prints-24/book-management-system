@@ -27,7 +27,6 @@ export async function apiCall(url, method, data) {
 
     return responseData;
   } catch (error) {
-    console.error('API call error:', error);
     throw error;
   }
 }

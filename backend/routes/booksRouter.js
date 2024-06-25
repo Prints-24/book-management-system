@@ -6,7 +6,7 @@ const router = express.Router();
 router.post("/add", (req, res) => {
   Book.add(req.body, (err, bookId) => {
     if (err) {
-      res.status(500).json({ error: "Failed to add book", message: err.message });
+      res.status(500).json({ error: "Failed to add book" });
     } else {
       res.json({ message: "Book added successfully", bookId });
     }
@@ -18,7 +18,7 @@ router.get('/search', (req, res) => {
   const { title } = req.query;
   Book.searchByTitle(title, (err, books) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to search books', message: err.message });
+      res.status(500).json({ error: 'Failed to search books' });
     } else {
       res.json(books);
     }
@@ -29,7 +29,7 @@ router.get('/search', (req, res) => {
 router.get("/", (req, res) => {
   Book.getAll((err, books) => {
     if (err) {
-      res.status(500).json({ error: "Failed to retrieve books", message:err.message });
+      res.status(500).json({ error: "Failed to retrieve books" });
     } else {
       res.json(books);
     }
@@ -40,7 +40,7 @@ router.get("/", (req, res) => {
 router.get('/:id', (req, res) => {
   Book.getById(req.params.id, (err, book) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to retrieve the book', message: err.message });
+      res.status(500).json({ error: 'Failed to retrieve the book' });
     } else {
       res.json(book);
     }
@@ -51,7 +51,7 @@ router.get('/:id', (req, res) => {
 router.put("/update/:id", (req, res) => {
   Book.update(req.params.id, req.body, (err, updatedBook) => {
     if (err) {
-      res.status(500).json({ error: "Failed to update book", message: err.message });
+      res.status(500).json({ error: "Failed to update book" });
     } else {
       res.json({ message: "Book updated successfully", updatedBook });
     }
@@ -63,7 +63,7 @@ router.put("/update/:id", (req, res) => {
 router.delete("/delete/:id", (req, res) => {
   Book.delete(req.params.id, (err) => {
     if (err) {
-      res.status(500).json({ error: "Failed to delete book", message: err.message });
+      res.status(500).json({ error: "Failed to delete book" });
     } else {
       res.json({ message: "Book deleted successfully" });
     }

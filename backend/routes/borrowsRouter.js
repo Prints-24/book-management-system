@@ -9,9 +9,9 @@ router.post("/add", (req, res) => {
   // Check if the book is already borrowed
   Borrow.isBookBorrowed(book_id, (err, row) => {
     if (err) {
-      res.status(500).json({ error: "Failed to borrow book", message: err.message });
+      res.status(500).json({ error: "Failed to borrow book" });
     } else if (row) {
-      res.status(400).json({ error: "Book is already borrowed", message: err.message });
+      res.status(400).json({ error: "Book is already borrowed" });
     } else {
         // If not already borrowed, proceed with borrowing
         Borrow.add(
@@ -21,7 +21,7 @@ router.post("/add", (req, res) => {
           },
           (err, borrowId) => {
             if (err) {
-              res.status(500).json({ error: "Failed to borrow book", message: err.message });
+              res.status(500).json({ error: "Failed to borrow book" });
             } else {
               res.json({ message: "Book borrowed successfully", borrowId });
             }
@@ -35,13 +35,13 @@ router.post("/add", (req, res) => {
 // Return a book
 router.post("/return/:id", (req, res) => {
   const borrowId = req.params.id;
-  Borrow.returnBook(borrowId, (err, borrowId) => {
+  const { user_id } = req.body;
+  Borrow.returnBook(user_id, borrowId, (err) => {
     if (err) {
-      res.status(500).json({ error: "Failed to return book", message: err.message });
+      res.status(500).json(err.message);
     } else {
       res.json({
-        message: "Book returned successfully",
-        borrowId,
+        message: "Book returned successfully"
       });
     }
   });
@@ -50,13 +50,13 @@ router.post("/return/:id", (req, res) => {
 // Renew a book
 router.post("/renew/:id", (req, res) => {
   const borrowId = req.params.id;
-  Borrow.renewBook(borrowId, (err, borrowId) => {
+  const { user_id } = req.body;
+  Borrow.renewBook(user_id, borrowId, (err) => {
     if (err) {
-      res.status(500).json({ error: "Failed to renew book", message: err.message });
+      res.status(500).json(err.message);
     } else {
       res.json({
-        message: "Book renewed successfully",
-        borrowId,
+        message: "Book renewed successfully"
       });
     }
   });

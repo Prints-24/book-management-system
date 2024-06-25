@@ -11,7 +11,7 @@ router.post("/register", (req, res) => {
     { username, password: hashPassword(password), role },
     (err, userId) => {
       if (err) {
-        res.status(500).json({ error: "Failed to register user", message: err.message });
+        res.status(500).json({ error: "Failed to register user" });
       } else {
         res.json({ message: "User registered successfully", userId });
       }
@@ -23,7 +23,7 @@ router.post("/register", (req, res) => {
 router.post("/login", (req, res) => {
   User.getByUsername(req.body.username, (err, user) => {
     if (err || !user || !comparePassword(req.body.password, user.password)) {
-      res.status(401).json({ error: "Invalid credentials", message: err.message });
+      res.status(401).json({ error: "Invalid credentials" });
     } else {
       const token = generateToken({
         userId: user.id,

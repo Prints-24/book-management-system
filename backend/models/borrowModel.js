@@ -41,16 +41,20 @@ class Borrow {
     );
   }
 
-  static returnBook(borrowId, callback) {
+  static returnBook(user_id, borrowId, callback) {
     const returnDate = new Date().toISOString();
     db.run(
-      `UPDATE borrows SET return_date = ? WHERE id = ? AND return_date IS NULL`,
-      [returnDate, borrowId],
+      `UPDATE borrows SET return_date = ? WHERE id = ? AND user_id = ? AND return_date IS NULL`,
+      [returnDate, borrowId, user_id],
       function (err) {
         if (err) {
           callback(err);
         } else if (this.changes === 0) {
-          callback(new Error("Book is already returned"));
+          callback(
+            new Error(
+              "Book not borrowed"
+            )
+          );
         } else {
           callback(null, borrowId);
         }
@@ -58,29 +62,35 @@ class Borrow {
     );
   }
 
-  static renewBook(borrowId, callback) {
+  static renewBook(user_id, borrowId, callback) {
     db.get(
-      `SELECT due_date FROM borrows WHERE id = ? AND return_date IS NULL`,
-      [borrowId],
+      `SELECT due_date FROM borrows WHERE id = ? AND user_id = ? AND return_date IS NULL`,
+      [borrowId, user_id],
       (err, row) => {
         if (err) {
           callback(err);
         } else if (!row) {
-          callback(new Error("Book is already returned"));
+          callback(
+            new Error(
+              "Book not borrowed"
+            )
+          );
         } else {
           const currentDueDate = new Date(row.due_date);
           const newDueDate = new Date(currentDueDate);
           newDueDate.setDate(newDueDate.getDate() + 7); // Extend the due date by 7 days
 
           db.run(
-            `UPDATE borrows SET due_date = ? WHERE id = ? AND return_date IS NULL`,
-            [newDueDate.toISOString(), borrowId],
+            `UPDATE borrows SET due_date = ? WHERE id = ? AND user_id = ? AND return_date IS NULL`,
+            [newDueDate.toISOString(), borrowId, user_id],
             function (err) {
               if (err) {
                 callback(err);
               } else if (this.changes === 0) {
                 callback(
-                  new Error("Book is already returned")
+                  new Error(
+                    "Book not borrowed"
+                  )
                 );
               } else {
                 callback(null, borrowId);

@@ -12,7 +12,7 @@ router.use((req, res, next) => {
     req.user = user;
     next();
   } else {
-    res.status(401).json({ error: "Unauthorized", message: err.message });
+    res.status(401).json({ error: "Unauthorized" });
   }
 });
 
@@ -23,7 +23,7 @@ router.post('/add', (req, res) => {
     { username, password: hashPassword(password), role },
     (err, userId) => {
       if (err) {
-        res.status(500).json({ error: 'Failed to add user', message:err.message });
+        res.status(500).json({ error: 'Failed to add user' });
       } else {
         res.json({ message: 'User added successfully', userId });
       }
@@ -35,7 +35,7 @@ router.post('/add', (req, res) => {
 router.get('/', (req, res) => {
   User.getUsers((err, users) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to fetch users', message:err.message });
+      res.status(500).json({ error: 'Failed to fetch users' });
     } else {
       res.json(users);
     }
@@ -46,7 +46,7 @@ router.get('/', (req, res) => {
 router.get('/:username', (req, res) => {
   User.getByUsername(req.params.username, (err, user) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to retrieve user', message:err.message });
+      res.status(500).json({ error: 'Failed to retrieve user' });
     } else {
       res.json(user);
     }
@@ -57,7 +57,7 @@ router.get('/:username', (req, res) => {
 router.put('/update/:id', (req, res) => {
   User.update(req.params.id, req.body, (err) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to update user', message:err.message });
+      res.status(500).json({ error: 'Failed to update user' });
     } else {
       res.json({ message: 'User updated successfully' });
     }
@@ -68,7 +68,7 @@ router.put('/update/:id', (req, res) => {
 router.delete('/delete/:id', (req, res) => {
   User.delete(req.params.id, (err) => {
     if (err) {
-      res.status(500).json({ error: 'Failed to delete user', message:err.message });
+      res.status(500).json({ error: 'Failed to delete user' });
     } else {
       res.json({ message: 'User deleted successfully' });
     }

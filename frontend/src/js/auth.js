@@ -63,7 +63,7 @@ export async function renderDashboard() {
       renderUserList(users);
     }
   } catch (error) {
-    alert(error);
+    alert(error.message);
   }
 }
 
@@ -237,6 +237,11 @@ function renderUserList(users) {
 
 export function renderSearchResults(books) {
   const searchResults = document.getElementById("search-results");
+  const bookList = document.getElementById("book-list");
+  const userRole = localStorage.getItem("role");
+  const userList = document.getElementById("user-list");
+  bookList.innerHTML = "";
+  userList.innerHTML = "";
   searchResults.innerHTML = `
     <h2>Search Results</h2>
     <ul>
@@ -245,13 +250,29 @@ export function renderSearchResults(books) {
           (book) => `
         <li>
           <strong>${book.title}</strong> (ISBN: ${book.isbn})
-          <button class="borrow-book" data-id="${book.id}">Borrow</button>
-          <button class="return-book" data-id="${book.borrowId}">Return</button>
-          <button class="renew-book" data-id="${book.borrowId}">Renew</button>
+          ${
+            userRole === "patron"
+              ? `
+            <button class="borrow-book" data-id="${book.id}">Borrow</button>
+            <button class="return-book" data-id="${book.borrowId}">Return</button>
+            <button class="renew-book" data-id="${book.borrowId}">Renew</button>
+            `
+              : ""
+          }
+
+          ${
+            userRole === "librarian"
+              ? `
+            <button class="edit-book" data-id="${book.id}">Edit</button>
+            <button class="delete-book" data-id="${book.id}">Delete</button>
+          `
+              : ""
+          }
         </li>
       `
         )
         .join("")}
     </ul>
+    <button id="show-dashboard">Back to Dashboard</button>
   `;
 }
