@@ -71,6 +71,7 @@ export async function borrowBook(bookId) {
     const { borrowId } = response;
     localStorage.setItem("borrowId", borrowId);
     alert(response.message);
+    renderDashboard();
   } catch (error) {
     alert(error.message);
   }
@@ -87,6 +88,7 @@ export async function returnBook() {
       }
     );
     alert(response.message);
+    renderDashboard();
   } catch (error) {
     alert(error.message);
   }

@@ -31,21 +31,26 @@ class Book {
   }
 
   static searchByTitle(title, callback) {
-    db.all(
-      `SELECT * FROM books WHERE title LIKE ?`,
-      [`%${title}%`],
-      (err, rows) => {
-        if (err) {
-          callback(err);
-        } else {
-          callback(null, rows);
-        }
+    db.all(`
+      SELECT books.*, borrows.id as borrowId
+      FROM books
+      LEFT JOIN borrows ON books.id = borrows.book_id AND borrows.return_date IS NULL
+      WHERE books.title LIKE ?
+    `, [`%${title}%`], (err, rows) => {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, rows);
       }
-    );
+    });
   }
 
   static getAll(callback) {
-    db.all(`SELECT * FROM books`, [], callback);
+    db.all(`
+      SELECT books.*, borrows.id as borrowId
+      FROM books
+      LEFT JOIN borrows ON books.id = borrows.book_id AND borrows.return_date IS NULL
+    `, [], callback);
   }
 
   static getById(id, callback) {

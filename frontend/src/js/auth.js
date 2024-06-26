@@ -1,21 +1,6 @@
 import { getBooks } from "./books.js";
 import { getUsers } from "./users.js";
 
-export function renderLoginPage() {
-  const app = document.getElementById("app");
-  app.innerHTML = `
-    <h2>Login</h2>
-    <form id="login-form">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <button type="submit">Login</button>
-    </form>
-    <button id="show-register-form">Register</button>
-  `;
-}
-
 export function renderRegisterPage() {
   const app = document.getElementById("app");
   app.innerHTML = `
@@ -31,8 +16,25 @@ export function renderRegisterPage() {
         <option value="librarian">Librarian</option>
       </select>
       <button type="submit">Register</button>
+      <button id="show-login-form">Back to Login</button>
     </form>
-    <button id="show-login-form">Back to Login</button>
+    
+  `;
+}
+
+export function renderLoginPage() {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <h2>Login</h2>
+    <form id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit">Login</button>
+      <button id="show-register-form">Register</button>
+    </form>
+    
   `;
 }
 
@@ -42,7 +44,6 @@ export async function renderDashboard() {
   app.innerHTML = `
     <header>
       <h1>Book Cataloging and Management System</h1>
-      <h2>Search Books</h2>
       <input type="text" id="search-input" placeholder="Enter book title">
       <button id="search-button">Search</button>
       ${role === "librarian" ? '<button id="add-book">Add Book</button>' : ""}
@@ -140,9 +141,7 @@ export function renderUserForm(user = {}) {
         username || ""
       }" required>
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" value="${
-        password || ""
-      }" required>
+      <input type="password" id="password" name="password" value="" required>
       <label for="role">Role:</label>
       <select id="role" name="role" required>
         <option value="patron" ${
@@ -158,40 +157,82 @@ export function renderUserForm(user = {}) {
   `;
 }
 
+export function renderSearchResults(books) {
+  const searchResults = document.getElementById("search-results");
+  const bookList = document.getElementById("book-list");
+  const userRole = localStorage.getItem("role");
+  const userList = document.getElementById("user-list");
+  bookList.innerHTML = "";
+  userList.innerHTML = "";
+  searchResults.innerHTML = `
+    <h2>Search List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Book</th>
+          <th>ISBN</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      ${books
+        .map((book) => `
+        <tr>
+          <td>${book.title}</td>
+          <td>${book.isbn}</td>
+          <td>
+            ${userRole === "patron" ? `
+              ${!book.borrowId ? `<button class="borrow-book" data-id="${book.id}">Borrow</button>` : ""}
+              ${book.borrowId ? `<button class="return-book" data-id="${book.borrowId}">Return</button>` : ""}
+              ${book.borrowId ? `<button class="renew-book" data-id="${book.borrowId}">Renew</button>` : ""}
+            ` : ""}
+            ${userRole === "librarian" ? `
+              <button class="edit-book" data-id="${book.id}">Edit</button>
+              <button class="delete-book" data-id="${book.id}">Delete</button>
+            ` : ""}
+          </td>
+        </tr>
+      `).join("")}
+      </tbody>
+    </table>
+    <button id="show-dashboard">Back to Dashboard</button>
+  `;
+}
+
 function renderBookList(books) {
   const userRole = localStorage.getItem("role");
   const bookList = document.getElementById("book-list");
   bookList.innerHTML = `
     <h2>Book List</h2>
-    <ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Book</th>
+          <th>ISBN</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
       ${books
-        .map(
-          (book) => `
-        <li>
-          <strong>${book.title}</strong> (ISBN: ${book.isbn})
-          ${
-            userRole === "patron"
-              ? `
-            <button class="borrow-book" data-id="${book.id}">Borrow</button>
-            <button class="return-book" data-id="${book.borrowId}">Return</button>
-            <button class="renew-book" data-id="${book.borrowId}">Renew</button>
-            `
-              : ""
-          }
-
-          ${
-            userRole === "librarian"
-              ? `
-            <button class="edit-book" data-id="${book.id}">Edit</button>
-            <button class="delete-book" data-id="${book.id}">Delete</button>
-          `
-              : ""
-          }
-        </li>
-      `
-        )
-        .join("")}
-    </ul>
+        .map((book) => `
+        <tr>
+          <td>${book.title}</td>
+          <td>${book.isbn}</td>
+          <td>
+            ${userRole === "patron" ? `
+              ${!book.borrowId ? `<button class="borrow-book" data-id="${book.id}">Borrow</button>` : ""}
+              ${book.borrowId ? `<button class="return-book" data-id="${book.borrowId}">Return</button>` : ""}
+              ${book.borrowId ? `<button class="renew-book" data-id="${book.borrowId}">Renew</button>` : ""}
+            ` : ""}
+            ${userRole === "librarian" ? `
+              <button class="edit-book" data-id="${book.id}">Edit</button>
+              <button class="delete-book" data-id="${book.id}">Delete</button>
+            ` : ""}
+          </td>
+        </tr>
+      `).join("")}
+      </tbody>
+    </table>
   `;
 }
 
@@ -232,47 +273,5 @@ function renderUserList(users) {
           .join("")}
       </tbody>
     </table>
-  `;
-}
-
-export function renderSearchResults(books) {
-  const searchResults = document.getElementById("search-results");
-  const bookList = document.getElementById("book-list");
-  const userRole = localStorage.getItem("role");
-  const userList = document.getElementById("user-list");
-  bookList.innerHTML = "";
-  userList.innerHTML = "";
-  searchResults.innerHTML = `
-    <h2>Search Results</h2>
-    <ul>
-      ${books
-        .map(
-          (book) => `
-        <li>
-          <strong>${book.title}</strong> (ISBN: ${book.isbn})
-          ${
-            userRole === "patron"
-              ? `
-            <button class="borrow-book" data-id="${book.id}">Borrow</button>
-            <button class="return-book" data-id="${book.borrowId}">Return</button>
-            <button class="renew-book" data-id="${book.borrowId}">Renew</button>
-            `
-              : ""
-          }
-
-          ${
-            userRole === "librarian"
-              ? `
-            <button class="edit-book" data-id="${book.id}">Edit</button>
-            <button class="delete-book" data-id="${book.id}">Delete</button>
-          `
-              : ""
-          }
-        </li>
-      `
-        )
-        .join("")}
-    </ul>
-    <button id="show-dashboard">Back to Dashboard</button>
   `;
 }
